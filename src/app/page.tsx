@@ -1,5 +1,6 @@
 'use client'
-
+import CarCreator from '@/components/create-car'
+import { Button, NextUIProvider } from '@nextui-org/react'
 import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 function App() {
   const account = useAccount()
@@ -14,30 +15,16 @@ function App() {
   }
   return (
     <>
-      <div>
-        <h2>Account</h2>
-
-        <div>
-          status: {account.status}
-          <br />
-          addresses: {JSON.stringify(account.addresses)}
-          <br />
-          chainId: {account.chainId}
-        </div>
-
-        {account.status === 'connected' && (
-          <button type="button" onClick={() => disconnect()}>
+    <NextUIProvider>
+        {account.status === 'connected' ? (
+          <Button color="primary" variant="flat" onClick={() => disconnect()}>
             Disconnect
-          </button>
-        )}
-      </div>
-
-      <div>
-        <h2>Connect</h2>
-        
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div>
+          </Button>
+        ) :  <Button color="primary" variant="flat" onClick={()=> connect({connector:getMetamask()})}>
+        Connect
+      </Button> }    
+     <CarCreator/>
+      </NextUIProvider>
     </>
   )
 }
