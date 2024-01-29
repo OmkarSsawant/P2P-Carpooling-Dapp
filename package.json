@@ -14,8 +14,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "latest",
-    "wagmi": "latest",
-    "babel-plugin-styled-components": "^2.1.4"
+    "wagmi": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.7.2",
