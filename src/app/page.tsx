@@ -1,12 +1,17 @@
 'use client'
 
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-
+import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 function App() {
   const account = useAccount()
   const { connectors, connect, status, error } = useConnect()
   const { disconnect } = useDisconnect()
-
+  var metamask:Connector;
+  const getMetamask = ()=> {
+    if(metamask)
+    return metamask
+    metamask = connectors.find((e)=>e.id=="io.metamask")!
+    return metamask
+  }
   return (
     <>
       <div>
@@ -29,15 +34,7 @@ function App() {
 
       <div>
         <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-          >
-            {connector.name}
-          </button>
-        ))}
+        
         <div>{status}</div>
         <div>{error?.message}</div>
       </div>
