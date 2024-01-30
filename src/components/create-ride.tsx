@@ -64,34 +64,36 @@ useEffect(() => {
 
   async function createRide() {
     
-    let hash = await writeContractAsync({
-      abi,
-      address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      functionName:"registerRide",
-      args:[
-          (car.data as any).seats,
-          String(startPlace?.address?.freeformAddress),
-          String(endPlace?.address?.freeformAddress),
-          BigInt(parseFloat(fee) * 10**18),
-          Date.parse((dateTimeInput!.current! as any).value),
-          0
-      ]  
-    });
-    alert(`Ride Created ${hash}`)
-  // fetch('/api/create-ride',{
-  //   method:"POST",
-  //   headers:{
-  //     "Content-Type":"application/json"
-  //   },
-  //   body:JSON.stringify({
-  //     "name" : BigInt((car.data as any)[6]),
-  //     "start" : startPlace,
-  //    "end" : endPlace,
-  //    "fare": BigInt(parseFloat(fee) * 10**18),
-  //     "depart" : Date.parse((dateTimeInput!.current! as any).value),
-  //     "reached":0
-  //   })
-  // })
+    // let hash = await writeContractAsync({
+    //   abi,
+    //   address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    //   functionName:"registerRide",
+    //   args:[
+    //       (car.data as any).seats,
+    //       String(startPlace?.address?.freeformAddress),
+    //       String(endPlace?.address?.freeformAddress),
+    //       BigInt(parseFloat(fee) * 10**18),
+    //       Date.parse((dateTimeInput!.current! as any).value),
+    //       0
+    //   ]  
+    // });
+    // alert(`Ride Created ${hash}`)
+ await  fetch('/api/create-ride',{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    
+    body:JSON.stringify({
+      "name" : "BigInt((car.data as any)[6])",
+      "start" : "startPlace",
+     "end" : "endPlace",
+     "fare": "BigInt(parseFloat(fee) * 10**18)",
+      "depart" : "Date.parse((dateTimeInput!.current! as any).value)",
+      "reached":0
+    })
+  })
+  .catch(console.error)
 
 
   }
@@ -109,7 +111,7 @@ useEffect(() => {
       isReadOnly
       label="Start Address"
       labelPlacement="outside"
-    value={String(startPlace?.address?.freeformAddress)}
+    value={String(startPlace?.address?.freeformAddress ?? "")}
       defaultValue=""
       className="max-w-xs"
     />
@@ -119,7 +121,7 @@ useEffect(() => {
       label="End Address"
       labelPlacement="outside"
     
-      value={String(endPlace?.address?.freeformAddress)}
+      value={String(endPlace?.address?.freeformAddress ?? "")}
 
       className="max-w-xs"
     />
