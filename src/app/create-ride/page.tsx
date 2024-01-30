@@ -1,18 +1,17 @@
 'use client'
-import { PeerCabNavBar } from '@/components/nav-bar'
+import { P2PCabNavBar } from '@/components/nav-bar'
 import DriverRegisterer from '@/components/register-driver'
 import { NextUIProvider } from '@nextui-org/react'
-function App() {
+ function CreateRide() {
  
   return (    
     <>
-         
          <NextUIProvider>
-      <PeerCabNavBar/>
-      <h1>Landing Page</h1>
-      </NextUIProvider>
+      <P2PCabNavBar pageIndex={2}/>
+     <h1>CREATE RIDE</h1>
+     </NextUIProvider>
     </>
   )
 }
 
-export default App
+export default CreateRide

@@ -1,16 +1,15 @@
 'use client'
-import { PeerCabNavBar } from '@/components/nav-bar'
+import { P2PCabNavBar } from '@/components/nav-bar'
 import DriverRegisterer from '@/components/register-driver'
 import { NextUIProvider } from '@nextui-org/react'
 function App() {
  
   return (    
     <>
-         
          <NextUIProvider>
-      <PeerCabNavBar/>
-      <h1>Landing Page</h1>
-      </NextUIProvider>
+      <P2PCabNavBar pageIndex={1}/>
+     <DriverRegisterer />
+     </NextUIProvider>
     </>
   )
 }
