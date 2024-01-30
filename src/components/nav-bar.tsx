@@ -10,7 +10,7 @@ export const P2PCabNavBar : FunctionComponent<PageInfo> = ({pageIndex})=>{
     const { connectors, connect, status, error } = useConnect()
     const { disconnect } = useDisconnect()
     var metamask:Connector;
-  const [currentPage,setCurrentPage] = useState(0);
+ 
 
     const getMetamask = ()=> {
       if(metamask)

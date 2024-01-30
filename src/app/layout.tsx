@@ -13,10 +13,11 @@ import { Navbar, NextUIProvider } from '@nextui-org/react'
 export default function RootLayout(props: { children: ReactNode }) {
   return (
     <html lang="en">
+      
       <body >
       <Providers>
         
-        <main className='dark text-foreground bg-background ' style={{
+        <main className='dark text-foreground bg-gradient-to-tr from-violet-900 from-20% via-black via-100% to-purple-500 to-50%' style={{
           height:"100vh"
         }}>
           

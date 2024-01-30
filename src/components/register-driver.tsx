@@ -24,6 +24,7 @@ export default function DriverRegisterer(){
     const [amount,setamount] = useState("")
     
     return(<>
+   
     { error && (<><h1 color="danger"> Error {error?.message}</h1><br/>,</>)}
     <center>
 

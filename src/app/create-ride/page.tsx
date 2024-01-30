@@ -1,14 +1,16 @@
 'use client'
 import { P2PCabNavBar } from '@/components/nav-bar'
-import DriverRegisterer from '@/components/register-driver'
-import { NextUIProvider } from '@nextui-org/react'
+
+import { NextUIProvider, Spacer } from '@nextui-org/react'
+import RideCreator from '@/components/create-ride'
  function CreateRide() {
  
   return (    
     <>
-         <NextUIProvider>
+        <NextUIProvider>
       <P2PCabNavBar pageIndex={2}/>
-     <h1>CREATE RIDE</h1>
+      <Spacer className='h-2'/>
+     <RideCreator />
      </NextUIProvider>
     </>
   )
