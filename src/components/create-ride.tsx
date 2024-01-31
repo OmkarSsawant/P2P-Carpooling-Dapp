@@ -23,9 +23,9 @@ export default function RideCreator(){
 
     const [startPlace,setStartPlace] = useState<any|undefined>()
     const [endPlace,setEndPlace] = useState<any|undefined>()
+    const [map,setMap] = useState<tt.Map|undefined>()
 const mapElement = useRef();
 const dateTimeInput = useRef();
-var map:tt.Map
 var geojson:String
 const myFilter = (textValue: string, inputValue: string) => {
     if (inputValue.length === 0) {
@@ -46,14 +46,16 @@ useEffect(() => {
     setLoc ({latitude,longitude})
     console.log("loc",loc);
     
-     map = tt.map({
+    let  map = tt.map({
         key: "zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild",  
         container:mapElement.current!,
         center:[longitude,latitude],
         zoom:14
       });
-      return () => map.remove();
+      setMap(map)
     })
+    return () => map?.remove();
+
   }, []);
 
 
@@ -100,26 +102,21 @@ useEffect(() => {
 
   }
 
- async function showRoute() {
+ async function showRoute(sp,ep,m:tt.Map) {
+console.log(sp,ep,m);
 
-  if(!startPlace  || !endPlace || !map) return; 
+  if(!sp  || !ep || !m) return; 
+console.log("Route Calculating ...");
+
    var res =await  tts.services.calculateRoute({
-     locations:`${startPlace.position.lon},${startPlace.position.lat}:${endPlace.position.lon},${endPlace.position.lat}`,
+     locations:`${sp.position.lon},${sp.position.lat}:${ep.position.lon},${ep.position.lat}`,
       traffic:false,
       key:"zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild"
     })
     let  gj = res.toGeoJson()
-    var points = []
-    res.routes[0].legs[0].points[0]
-    for(var leg of res.routes[0].legs){
-        points.push(res.routes[0].legs[0].points[0])
-        var marker = new tt.Marker()
-        .setLngLat( LngLat.convert({lat:leg.points[0].lat!,lng:leg.points[0].lng!}))
-        .addTo(map);
-        points.push({lat:leg.points[0].lat!,lng:leg.points[0].lng!})
-      }
-      geojson = JSON.stringify(points)
-    map.addLayer({
+console.log("Route Calculated");
+
+    m.addLayer({
       id: "route",
       type: "line",
       source: {
@@ -133,10 +130,27 @@ useEffect(() => {
     })
     var bounds = new tt.LngLatBounds()
     gj.features[0].geometry.coordinates.forEach(function (point:any) {
-      bounds.extend(tt.LngLat.convert([point.y,point.x]))
+      console.log(point);
+      
+      bounds.extend(tt.LngLat.convert(point))
     })
-    map.fitBounds(bounds, { padding: 20 })
+    m.fitBounds(bounds, { padding: 20 })
+console.log("Route Drawn");
 
+    var points = []
+    res.routes[0].legs[0].points[0]
+    for(var leg of res.routes[0].legs){
+        points.push(leg.points[0])
+        var marker = new tt.Marker()
+        
+        .setLngLat( LngLat.convert({lat:leg.points[0].lat!,lng:leg.points[0].lng!}))
+        .addTo(m);
+        points.push({lat:leg.points[0].lat!,lng:leg.points[0].lng!})
+      }
+      geojson = JSON.stringify(points)
+   
+      console.log('legs.points',points);
+      
   }
 
     return(<>
@@ -189,12 +203,12 @@ useEffect(() => {
       onSelectionChange={(pid:Key)=>{
         console.log(pid,(searchResults[0] as any).id);
         
-        let startPlace = searchResults.find((v:any)=>v.id == pid.toString())
-        console.log(startPlace);
+        let sp = searchResults.find((v:any)=>v.id == pid.toString())
+        console.log('set-start-place',sp);
         
-        setStartPlace(startPlace)
-        if(endPlace){
-          showRoute()
+        setStartPlace(sp)
+        if(endPlace!=undefined && map!=undefined){
+          showRoute(sp,endPlace,map);
         }
     }}      
       defaultFilter={myFilter}
@@ -221,12 +235,13 @@ useEffect(() => {
         onSelectionChange={(pid:Key)=>{
             console.log(pid);
             
-            let endPlace = searchResults2.find((v:any)=>v.id == pid.toString())
-            console.log(endPlace);
+            let ep = searchResults2.find((v:any)=>v.id == pid.toString())
+            console.log("set-end-place",ep);
+            console.log("get-start-place",startPlace);
             
-            setEndPlace(endPlace)
-            if(startPlace){
-              showRoute()
+            setEndPlace(ep)
+            if(startPlace!=undefined && map!=undefined){
+              showRoute(startPlace,ep,map)
             }
         }}
       className="max-w-xs"

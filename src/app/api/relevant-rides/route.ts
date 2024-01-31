@@ -16,7 +16,7 @@ async function POST(req:NextRequest){
         
     }).map(doc=>doc._id);
     for await (const rideId of cur){
-                
+                console.log("rideId",rideId);
     }
     
 
