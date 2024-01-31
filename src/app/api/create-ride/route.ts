@@ -7,7 +7,7 @@ export  async function POST(req:NextRequest){
     const db = (await mongoClientPromise).db("peercab");
     var res = await db.collection("rides")
     .insertOne(ride);
-
+//Upload Route to redis
     return NextResponse.json({"HURRAY":"UNDERSTOOD ",res})
 }
 

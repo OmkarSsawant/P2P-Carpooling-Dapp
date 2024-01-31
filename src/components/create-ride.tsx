@@ -78,18 +78,24 @@ useEffect(() => {
       ]  
     });
     alert(`Ride Created ${hash}`)
+
+    let sp = {}
+    let ep = {}
+    let route={}
+    
  await  fetch('/api/create-ride',{
     method:"POST",
     headers:{
       "Content-Type":"application/json"
     },
     body:JSON.stringify({
-      "name" : BigInt((car.data as any)[6]),
+      "name" : (car.data as any).name,
       "start" : startPlace,
      "end" : endPlace,
      "fare": BigInt(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
-      "reached":0
+      "reached":0,
+      route
     })
   }).catch(console.error)
 
