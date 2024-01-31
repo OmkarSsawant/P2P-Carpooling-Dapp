@@ -3,7 +3,8 @@ import {abi} from '@/abi/Carpooling.json';
 import { Key, useEffect, useRef, useState } from "react";
 import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
-import tt from '@tomtom-international/web-sdk-maps';
+import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
+import tts from '@tomtom-international/web-sdk-services'
 import { PlaceFinder } from "@/tom-tom/place-finder";
 
 export default function RideCreator(){
@@ -24,7 +25,8 @@ export default function RideCreator(){
     const [endPlace,setEndPlace] = useState<any|undefined>()
 const mapElement = useRef();
 const dateTimeInput = useRef();
-
+var map:tt.Map
+var geojson:String
 const myFilter = (textValue: string, inputValue: string) => {
     if (inputValue.length === 0) {
       return true;
@@ -44,7 +46,7 @@ useEffect(() => {
     setLoc ({latitude,longitude})
     console.log("loc",loc);
     
-    let map = tt.map({
+     map = tt.map({
         key: "zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild",  
         container:mapElement.current!,
         center:[longitude,latitude],
@@ -79,26 +81,61 @@ useEffect(() => {
     });
     alert(`Ride Created ${hash}`)
 
-    let sp = {}
-    let ep = {}
-    let route={}
-    
- await  fetch('/api/create-ride',{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
+    let ride = {
       "name" : (car.data as any).name,
       "start" : startPlace,
      "end" : endPlace,
      "fare": BigInt(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
       "reached":0,
-      route
-    })
+    }
+ await  fetch('/api/create-ride',{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({ride,geojson})
   }).catch(console.error)
 
+
+  }
+
+ async function showRoute() {
+
+  if(!startPlace  || !endPlace || !map) return; 
+   var res =await  tts.services.calculateRoute({
+     locations:`${startPlace.position.lon},${startPlace.position.lat}:${endPlace.position.lon},${endPlace.position.lat}`,
+      traffic:false,
+      key:"zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild"
+    })
+    let  gj = res.toGeoJson()
+    var points = []
+    res.routes[0].legs[0].points[0]
+    for(var leg of res.routes[0].legs){
+        points.push(res.routes[0].legs[0].points[0])
+        var marker = new tt.Marker()
+        .setLngLat( LngLat.convert({lat:leg.points[0].lat!,lng:leg.points[0].lng!}))
+        .addTo(map);
+        points.push({lat:leg.points[0].lat!,lng:leg.points[0].lng!})
+      }
+      geojson = JSON.stringify(points)
+    map.addLayer({
+      id: "route",
+      type: "line",
+      source: {
+        type: "geojson",
+        data: gj,
+      },
+      paint: {
+        "line-color": "#00d7ff",
+        "line-width": 8,
+      },
+    })
+    var bounds = new tt.LngLatBounds()
+    gj.features[0].geometry.coordinates.forEach(function (point:any) {
+      bounds.extend(tt.LngLat.convert([point.y,point.x]))
+    })
+    map.fitBounds(bounds, { padding: 20 })
 
   }
 
@@ -156,6 +193,9 @@ useEffect(() => {
         console.log(startPlace);
         
         setStartPlace(startPlace)
+        if(endPlace){
+          showRoute()
+        }
     }}      
       defaultFilter={myFilter}
       items={searchResults}
@@ -185,6 +225,9 @@ useEffect(() => {
             console.log(endPlace);
             
             setEndPlace(endPlace)
+            if(startPlace){
+              showRoute()
+            }
         }}
       className="max-w-xs"
       defaultFilter={myFilter}
