@@ -6,7 +6,7 @@ import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
 import { PlaceFinder } from "@/tom-tom/place-finder";
-import { compressRoute, generateWaypointsAtInterval, splitLine } from "@/lib/map-utils";
+import { compressRoute, splitLine } from "@/lib/map-utils";
 
 export default function RideCreator(){
     const {data:hash,error,writeContractAsync} = useWriteContract()
