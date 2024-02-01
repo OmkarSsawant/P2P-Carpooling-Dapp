@@ -38,7 +38,7 @@ export const P2PCabNavBar : FunctionComponent<PageInfo> = ({pageIndex})=>{
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color={pageIndex==3?undefined:"foreground"}  href="/book-cab">
+          <Link color={pageIndex==3?undefined:"foreground"}  href="/book-a-cab">
             Book A Cab
           </Link>
         </NavbarItem>
