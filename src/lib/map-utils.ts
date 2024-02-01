@@ -40,7 +40,8 @@ const points=[]
 for (let i = 0; i < routeGeometry.length; i+=skip) {
   const mid = Math.round((i+(i+skip-1))/2);
   const pe = routeGeometry[ mid];
-  points.push(pe);
+  if(pe!=undefined)
+  points.push({"latitude":pe.lat,"longitude":pe.lng});
 }
 
 return points

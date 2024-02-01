@@ -3,24 +3,34 @@ import mongoClientPromise from '@/lib/mongo';
 import { NextResponse } from "next/server";
 import { createClient } from 'redis';
 
-const client = createClient();
+// const client = createClient();
 
-client.on('error', (err:any) => console.log('Redis Client Error', err));
-(async function () {
-    await client.connect();
-    console.log("---------------- CONNECTED REDIS -----------------");
+// client.on('error', (err:any) => console.log('Redis Client Error', err));
+// (async function () {
+//     await client.connect();
+//     console.log("---------------- CONNECTED REDIS -----------------");
     
-})();
+// })();
 export  async function POST(req:NextRequest){
     let {ride,geojson}= await req.json()
-    console.log(ride);
+    console.log(ride,geojson);
+    geojson = JSON.parse(geojson)
+   console.log(typeof geojson,typeof geojson[0]);
+   
     const db = (await mongoClientPromise).db("peercab");
     var res = await db.collection("rides")
-    .insertOne(ride);
+    .insertOne({ride,geojson});
+    // var geoset = []
+    // for(var g of geojson){
+    //     g.member = `ride:${res.insertedId}`
+    //     geoset.push(g)
+    // }
+    // console.log("got GEOSET",geoset);
+    
 //Upload Route to redis with key  routes:_id of mongo
-client.geoAdd(`routes:${res.insertedId}`,geojson);
+// await client.geoAdd(`routes:${res.insertedId}`,geoset);
+console.log("check",`routes:${res.insertedId}`);
 
-//OPTIMI: deduce the size of route emit middle points 
     return NextResponse.json({"HURRAY":"UNDERSTOOD ",res})
 }
 

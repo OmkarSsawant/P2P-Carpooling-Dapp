@@ -25,9 +25,9 @@ export default function RideCreator(){
     const [startPlace,setStartPlace] = useState<any|undefined>()
     const [endPlace,setEndPlace] = useState<any|undefined>()
     const [map,setMap] = useState<tt.Map|undefined>()
+    const [geojson,setGeoJson] = useState("")
 const mapElement = useRef();
 const dateTimeInput = useRef();
-var geojson:String
 const myFilter = (textValue: string, inputValue: string) => {
     if (inputValue.length === 0) {
       return true;
@@ -69,6 +69,9 @@ useEffect(() => {
 
   async function createRide() {
     
+  
+    
+
     let hash = await writeContractAsync({
       abi,
       address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
@@ -88,10 +91,13 @@ useEffect(() => {
       "name" : (car.data as any).name,
       "start" : startPlace,
      "end" : endPlace,
-     "fare": BigInt(parseFloat(fee) * 10**18),
+     "fare": Math.round(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
       "reached":0,
     }
+
+    console.log("geojson",geojson);
+    
  await  fetch('/api/create-ride',{
     method:"POST",
     headers:{
@@ -103,7 +109,7 @@ useEffect(() => {
 
   }
 
- async function showRoute(sp,ep,m:tt.Map) {
+ async function showRoute(sp:any,ep:any,m:tt.Map) {
 console.log(sp,ep,m);
 
   if(!sp  || !ep || !m) return; 
@@ -120,7 +126,8 @@ console.log("Route Calculating ...");
 console.log("Route Calculated");
     let waypoints = compressRoute(res!,0.1);
     console.log("waypoints",waypoints);
-    geojson = JSON.stringify(waypoints)
+    setGeoJson(JSON.stringify(waypoints));
+    console.log("set-geojson",geojson);
     
     m.addLayer({
       id: "route",
@@ -147,7 +154,7 @@ for(const wp of waypoints){
   e.id = 'pickup-marker'
   try {
     var marker = new tt.Marker({element:e})
-    .setLngLat(tt.LngLat.convert(wp)).addTo(m);
+    .setLngLat(tt.LngLat.convert([wp.longitude!,wp.latitude!])).addTo(m);
     console.log("Market Added");
   } catch (error) {
     console.log("Scan",wp);
