@@ -47,3 +47,25 @@ for (let i = 0; i < routeGeometry.length; i+=skip) {
 return points
 
 }
+
+export function getDistanceFromLatLonInKm(point1, point2) {
+  function convertDegToRad(value:number) { return value * Math.PI / 180 }
+  const [lat1, lon1] = point1;
+  const [lat2, lon2] = point2;
+  const earthRadius = 6371;
+  const dLat = convertDegToRad(lat2 - lat1);
+  const dLon = convertDegToRad(lon2 - lon1);
+  const squarehalfChordLength =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(convertDegToRad(lat1)) * Math.cos(convertDegToRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const angularDistance = 2 * Math.atan2(Math.sqrt(squarehalfChordLength), Math.sqrt(1 - squarehalfChordLength));
+  const distance = earthRadius * angularDistance;
+  return distance;
+
+}
+export function inRange(l1:any,l2:any,km:number){
+  const dist = getDistanceFromLatLonInKm([l1.latitude,l1.longitude],[l2.latitude,l2.longitude])
+  return dist <= km;
+}

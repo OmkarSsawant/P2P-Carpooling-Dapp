@@ -16,6 +16,7 @@ export  async function POST(req:NextRequest){
     console.log(ride,geojson);
     geojson = JSON.parse(geojson)
    console.log(typeof geojson,typeof geojson[0]);
+   console.log(geojson);
    
     const db = (await mongoClientPromise).db("peercab");
     var res = await db.collection("rides")
