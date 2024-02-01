@@ -109,14 +109,16 @@ console.log(sp,ep,m);
   if(!sp  || !ep || !m) return; 
 console.log("Route Calculating ...");
 
-   var res =await  tts.services.calculateRoute({
-     locations:`${sp.position.lon},${sp.position.lat}:${ep.position.lon},${ep.position.lat}`,
-      traffic:false,
-      key:"zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild"
-    })
-    let  gj = res.toGeoJson()
+  
+    var res =await  tts.services.calculateRoute({
+      locations:`${sp.position.lon},${sp.position.lat}:${ep.position.lon},${ep.position.lat}`,
+       traffic:false,
+       key:"zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild"
+     })
+     
+    let  gj = res!.toGeoJson() 
 console.log("Route Calculated");
-    let waypoints = compressRoute(res);
+    let waypoints = compressRoute(res!,0.1);
     console.log("waypoints",waypoints);
     geojson = JSON.stringify(waypoints)
     
@@ -139,11 +141,24 @@ console.log("Route Calculated");
       bounds.extend(tt.LngLat.convert(point))
     })
     m.fitBounds(bounds, { padding: 20 })
-console.log("Route Drawn");
-
-
+// console.log("Route Drawn");
+for(const wp of waypoints){
+  let e = document.createElement('div')
+  e.id = 'pickup-marker'
+  try {
+    var marker = new tt.Marker({element:e})
+    .setLngLat(tt.LngLat.convert(wp)).addTo(m);
+    console.log("Market Added");
+  } catch (error) {
+    console.log("Scan",wp);
+    
+  }
+ 
+  
+}
       
   }
+
 
     return(<>
     
@@ -254,6 +269,7 @@ console.log("Route Drawn");
           
           <div ref={mapElement} className="mapDiv col-span-2"  ></div>
           
+
         </CardBody>
     </Card>
         </center>      

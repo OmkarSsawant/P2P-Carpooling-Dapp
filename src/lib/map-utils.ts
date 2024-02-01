@@ -17,17 +17,22 @@ export function splitLine(
   return points;
 }
 
-export function compressRoute(res:tts.CalculateRouteResponse){
-const routeGeoJSON = res.toGeoJson();
+export function compressRoute(res:tts.CalculateRouteResponse,km=1){
+// const routeGeoJSON = res.toGeoJson();
 const dist = res.routes[0].summary.lengthInMeters;
-const routeGeometry = routeGeoJSON.features[0].geometry.coordinates; // Adjust the path if needed
+// const routeGeometry = routeGeoJSON.features[0].geometry.coordinates; // Adjust the path if needed
 //Evenly  taking out indexes will probably distribute the route in 100m*;
+const routeGeometry = res.routes[0].legs[0].points;
+console.log(routeGeometry.length);
 
-const  secs = Math.round( dist/100);
+const  secs = Math.round( (dist/1000)) ; //1KM 
+console.log("secs",secs);
 
-const newLen =Math.round( (secs/dist) * routeGeometry.length);
+const newLen = Math.min(secs,routeGeometry.length);
+console.log("newLen",newLen);
 
 const skip =  Math.round(routeGeometry.length/newLen);
+console.log("skip",skip);
 
 const points=[]
 
