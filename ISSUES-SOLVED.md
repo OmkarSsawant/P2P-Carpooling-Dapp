@@ -32,3 +32,11 @@ The issue is either with metamask or hardhat. The metamask is giving irrelevant 
 Solution:
 * Reset Metamask
 * Add fallback function in contract *it should not be payable bcz user money will be wasted for failed call*.
+
+
+## Issue #4
+Given a Map Route Need to figure out whether the user can come uptil the route or not
+
+
+## Issue #5
+To make above possible need to save waypoints at specific distance as saving whole route will be time + space consuming also above computation will have redundant calculations.

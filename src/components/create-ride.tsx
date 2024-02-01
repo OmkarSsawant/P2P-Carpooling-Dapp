@@ -6,9 +6,10 @@ import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
 import { PlaceFinder } from "@/tom-tom/place-finder";
+import { compressRoute, generateWaypointsAtInterval, splitLine } from "@/lib/map-utils";
 
 export default function RideCreator(){
-    const {data:hash,writeContract,error,writeContractAsync} = useWriteContract()
+    const {data:hash,error,writeContractAsync} = useWriteContract()
 
     const car   = useReadContract({
      abi,
@@ -115,7 +116,10 @@ console.log("Route Calculating ...");
     })
     let  gj = res.toGeoJson()
 console.log("Route Calculated");
-
+    let waypoints = compressRoute(res);
+    console.log("waypoints",waypoints);
+    geojson = JSON.stringify(waypoints)
+    
     m.addLayer({
       id: "route",
       type: "line",
@@ -130,26 +134,14 @@ console.log("Route Calculated");
     })
     var bounds = new tt.LngLatBounds()
     gj.features[0].geometry.coordinates.forEach(function (point:any) {
-      console.log(point);
+      // console.log(point);
       
       bounds.extend(tt.LngLat.convert(point))
     })
     m.fitBounds(bounds, { padding: 20 })
 console.log("Route Drawn");
 
-    var points = []
-    res.routes[0].legs[0].points[0]
-    for(var leg of res.routes[0].legs){
-        points.push(leg.points[0])
-        var marker = new tt.Marker()
-        
-        .setLngLat( LngLat.convert({lat:leg.points[0].lat!,lng:leg.points[0].lng!}))
-        .addTo(m);
-        points.push({lat:leg.points[0].lat!,lng:leg.points[0].lng!})
-      }
-      geojson = JSON.stringify(points)
-   
-      console.log('legs.points',points);
+
       
   }
 
