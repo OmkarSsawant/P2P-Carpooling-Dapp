@@ -25,7 +25,7 @@ export  function CabBooker(){
     const [map,setMap] = useState<tt.Map|undefined>()
     const [geojson,setGeoJson] = useState("")
     const [selectedRide,setSelectedRide]  = useState<any|undefined>()
-
+    const [dist,setDist] = useState(0)
 const mapElement = useRef();
 const dateTimeInput = useRef();
 const edateTimeInput = useRef();
@@ -87,6 +87,7 @@ console.log("Route Calculated");
     let waypoints = compressRoute(res!,0.1);
     console.log("waypoints",waypoints);
     setGeoJson(JSON.stringify(waypoints));
+    setDist(res.routes[0].summary.lengthInMeters/1000)
     console.log("set-geojson",geojson);
     
     m.addLayer({
@@ -206,7 +207,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
       selectedRide.ride.driverAddress,
       selectedRide.ride.rideId 
     ],
-    value:BigInt(selectedRide.ride.fare)
+    value:BigInt(selectedRide.ride.fare * dist) 
   })
   await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}`)
   alert(`
@@ -382,7 +383,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
           />
         }
       >
-      {selectedRide?.ride?.fare/10**18}  Eth 
+      {(selectedRide?.ride?.fare/10**18) * dist}  Eth 
       </Chip>
            
       </div>
