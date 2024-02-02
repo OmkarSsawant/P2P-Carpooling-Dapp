@@ -1,6 +1,6 @@
 import { usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
-import { Key, useEffect, useRef, useState } from "react";
+import { Key, MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
@@ -122,21 +122,40 @@ for(const wp of waypoints){
       
   }
 
+const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
+  ev.preventDefault();
+  var res =  await fetch('/api/relevant-rides',{
+      method:"POST",
+      body:JSON.stringify({
+          "sloc":{"latitude":startPlace.position.lat,"longitude":startPlace.position.lon},
+          "eloc":{"latitude":endPlace.position.lat,"longitude":endPlace.position.lon},
+          "start":Date.parse((dateTimeInput!.current! as any).value),
+          "end":Date.parse((edateTimeInput!.current! as any).value),
+          range
+      })
+    }) 
+    let relevantRides :[]=await res.json(); 
+    for (var {_id,ride,pickupPoint,dropPoint} of relevantRides){
+      const pe = document.createElement('div');
+      pe.id = 'pickup-marker';
+      let pickPopUp = new tt.Popup({
+        className:"card",
+        closeOnClick:true,
+        closeButton:true,
+      }).setDOMContent();
+      let pm = new tt.Marker({element:pe})
+        .setLngLat({lat:pickupPoint.latitude!,lng:pickupPoint.longitude!})
+        .addTo(map!);
 
-   async function findRides(): Promise<void> {
-    var res =  await fetch('/api/relevant-rides',{
-        method:"POST",
-        body:JSON.stringify({
-            "sloc":{"latitude":startPlace.position.lat,"longitude":startPlace.lon},
-            "eloc":{"latitude":endPlace.position.lat,"longitude":endPlace.lon},
-            "start":Date.parse((dateTimeInput!.current! as any).value),
-            "end":Date.parse((edateTimeInput!.current! as any).value),
-            range
-        })
-      }) 
-    console.log(await res.json());
-     
+      const ee = document.createElement('div');
+      ee.id = 'drop-marker';
+ let dm = new tt.Marker({element:ee})
+        .setLngLat({lat:dropPoint.latitude!,lng:dropPoint.longitude!})
+        .addTo(map!)
+        
     }
+  }
+  
 
     return(<>
     

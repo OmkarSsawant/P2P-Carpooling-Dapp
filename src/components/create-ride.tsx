@@ -151,7 +151,7 @@ console.log("Route Calculated");
 // console.log("Route Drawn");
 for(const wp of waypoints){
   let e = document.createElement('div')
-  e.id = 'pickup-marker'
+  e.id = 'pickup-point-marker'
   try {
     var marker = new tt.Marker({element:e})
     .setLngLat(tt.LngLat.convert([wp.longitude!,wp.latitude!])).addTo(m);
