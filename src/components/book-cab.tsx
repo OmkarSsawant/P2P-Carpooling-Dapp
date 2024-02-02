@@ -1,12 +1,14 @@
 import { usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Key, MouseEventHandler, useEffect, useRef, useState } from "react";
-import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem, AutocompleteSection, Avatar, Button, Card, CardBody, CardFooter, Chip, Divider, Input, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
 import { PlaceFinder } from "@/tom-tom/place-finder";
 import { compressRoute, splitLine } from "@/lib/map-utils";
+
+import Image from "next/image";
 
 export  function CabBooker(){
     const {data:hash,error,writeContractAsync} = useWriteContract()
@@ -22,7 +24,7 @@ export  function CabBooker(){
     const [endPlace,setEndPlace] = useState<any|undefined>()
     const [map,setMap] = useState<tt.Map|undefined>()
     const [geojson,setGeoJson] = useState("")
-    const [selectedRide,setSelectedRide]  = useState({})
+    const [selectedRide,setSelectedRide]  = useState<any|undefined>()
 
 const mapElement = useRef();
 const dateTimeInput = useRef();
@@ -126,6 +128,7 @@ for(const wp of waypoints){
 
 const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
   ev.preventDefault();
+
   var res =  await fetch('/api/relevant-rides',{
       method:"POST",
       body:JSON.stringify({
@@ -148,10 +151,9 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
       const pe = document.createElement('div');
       pe.id = 'pickup-marker';
       pe.addEventListener('click',ev=>{
-        setSelectedRide({_id,ride,pickupPoint,dropPoint})
-        // map?.easeTo({
-        //   center:[dropPoint.longitude,dropPoint.latitude]
-        // })
+        // setSelectedRide({_id,ride,pickupPoint,dropPoint})
+          console.log("selected",{_id,ride,pickupPoint,dropPoint});
+          
       })
       // const puPopUpElement = document.createElement('div');
       // puPopUpElement.innerHTML = `
@@ -194,6 +196,23 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
   }
   
 
+ async function bookRide() {
+  console.log("booking Ride",JSON.stringify(selectedRide));
+ const txn =  await writeContractAsync({
+    address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    abi,
+    functionName:"addUserToRide",
+    args:[
+      selectedRide.driverAddress,
+      selectedRide.rideId 
+    ],
+    value:selectedRide.ride.fare
+  })
+  alert(`
+    Successfully Booked Cab ${txn}
+  `)
+  }
+
     return(<>
     
     { error && (<><h1 color="danger"> Error {error?.message}</h1><br/>,</>)}
@@ -201,8 +220,8 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
      <Spacer className="h-4"/>
      <center>
      <Card className="w-11/12 h-11/12">
-        <CardBody className="grid grid-cols-3">
-           <div >
+        <CardBody className="grid grid-cols-7">
+           <div className="col-span-2" >
        
 <Spacer/>
 
@@ -217,7 +236,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
         
         setStartPlace(sp)
         if(endPlace!=undefined && map!=undefined){
-          showRoute(sp,endPlace,map);
+         showRoute(sp,endPlace,map);
         }
     }}      
       defaultFilter={myFilter}
@@ -250,7 +269,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
             
             setEndPlace(ep)
             if(startPlace!=undefined && map!=undefined){
-              showRoute(startPlace,ep,map)
+             showRoute(startPlace,ep,map)
             }
         }}
       className="max-w-xs"
@@ -305,8 +324,82 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     <Spacer className="h-10"/>
    
            </div>
+
+           {selectedRide && 
+           <div className="col-span-2 mr-10">
+            <center>
+              <Card isBlurred >
+                <CardBody>
+           
+
+
+    <Spacer className="h-2"/>
+
+<Textarea
+            isReadOnly
+            label="Starts From"
+            value={selectedRide?.ride?.start?.address?.freeformAddress}
+            />
+      <Spacer/><Spacer/>
+      <Textarea
+            isReadOnly
+            label="Ends At"
+            value={selectedRide?.ride?.end?.address?.freeformAddress}
+            />
+      <Spacer/><Spacer/>
+      <Divider/>
+      <Button   onClick={()=>{
+                    if(selectedRide)
+                    map?.easeTo({
+                      center:[selectedRide?.pickupPoint.longitude,selectedRide?.pickupPoint.latitude]
+                    })
+                  }
+                  } color="success" startContent={<Image alt="pi" width={30} height={30} src="/assets/pickup.svg"/>}>
+        Show Pickup Point
+      </Button>  
+            <Spacer/><Spacer/>
+            <Button   onClick={()=>{
+                    if(selectedRide)
+                    map?.easeTo({
+                      center:[selectedRide?.dropPoint.longitude,selectedRide?.dropPoint.latitude]
+                    })
+                  }
+                  } color="success" startContent={<Image alt="ei" width={30} height={30} src="/assets/taxi-stop.png"/>}>
+        Show Drop Stop
+      </Button>   
+           
+            <Spacer/><Spacer/>
+      <div className="flex">
+
+            <h1>Fare : </h1>
+            <Chip
+        variant="flat"
+        avatar={
+          <Avatar
+            name="JW"
+            src="https://i.pravatar.cc/300?u=a042581f4e29026709d"
+          />
+        }
+      >
+      {selectedRide?.ride?.fare/10**18}  Eth 
+      </Chip>
+           
+      </div>
+    <Spacer className="h-2"/>
+
+                </CardBody>
+             <CardFooter>
+              <center>
+              <Button onClick={bookRide} color="success"> Book </Button>
+              </center>
+             </CardFooter>
+              </Card>
+            </center>
           
-          <div ref={mapElement} className="mapDiv col-span-2"  >
+           </div>
+           }
+         
+          <div ref={mapElement} className={`mapDiv col-span-3`}>
         
           </div>
           

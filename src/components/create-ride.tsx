@@ -1,4 +1,4 @@
-import { usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
+import { useAccount, usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Key, useEffect, useRef, useState } from "react";
 import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
@@ -7,6 +7,8 @@ import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
 import { PlaceFinder } from "@/tom-tom/place-finder";
 import { compressRoute, splitLine } from "@/lib/map-utils";
+import { readContract } from "wagmi/actions";
+import { config } from "@/wagmi";
 
 export default function RideCreator(){
     const {data:hash,error,writeContractAsync} = useWriteContract()
@@ -16,6 +18,7 @@ export default function RideCreator(){
       address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
       functionName:"getCarDetails",  
     })
+    const account = useAccount()
     
     const [loc,setLoc] = useState({"latitude":0,"longitude":0})
     const [searchResults,setSearchResults] = useState([]);
@@ -86,11 +89,17 @@ useEffect(() => {
       ]  
     });
     alert(`Ride Created ${hash}`)
+    const lastId = await readContract(config,{
+      abi,
+       address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+       functionName:"getLastRideIdOfDriver"});
 
     let ride = {
       "name" : (car.data as any).name,
       "start" : startPlace,
      "end" : endPlace,
+     "driverAddress":account.address,
+      "rideId":lastId,
      "fare": Math.round(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
       "reached":0,
