@@ -35,6 +35,8 @@ export async function POST(req:NextRequest){
             }
         }
         if(pickupPoint && dropPoint){
+         console.log("added-p-d",JSON.stringify({pickupPoint,dropPoint}));
+         
             relatedRides.push({_id,ride,pickupPoint,dropPoint})
         }
     }

@@ -1,7 +1,7 @@
 import { usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Key, MouseEventHandler, useEffect, useRef, useState } from "react";
-import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem, AutocompleteSection, Button, Card, CardBody, Chip, Divider, Input, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
@@ -22,6 +22,8 @@ export  function CabBooker(){
     const [endPlace,setEndPlace] = useState<any|undefined>()
     const [map,setMap] = useState<tt.Map|undefined>()
     const [geojson,setGeoJson] = useState("")
+    const [selectedRide,setSelectedRide]  = useState({})
+
 const mapElement = useRef();
 const dateTimeInput = useRef();
 const edateTimeInput = useRef();
@@ -107,7 +109,7 @@ console.log("Route Calculated");
 // console.log("Route Drawn");
 for(const wp of waypoints){
   let e = document.createElement('div')
-  e.id = 'pickup-marker'
+  e.id = 'pickup-point-marker'
   try {
     var marker = new tt.Marker({element:e})
     .setLngLat(tt.LngLat.convert([wp.longitude!,wp.latitude!])).addTo(m);
@@ -134,24 +136,59 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
           range
       })
     }) 
+
+    
+
     let relevantRides :[]=await res.json(); 
+    console.log('RELEVANT-RIDES',relevantRides,map);
+    
     for (var {_id,ride,pickupPoint,dropPoint} of relevantRides){
+      console.log(_id,pickupPoint,dropPoint);
+      
       const pe = document.createElement('div');
       pe.id = 'pickup-marker';
-      let pickPopUp = new tt.Popup({
-        className:"card",
-        closeOnClick:true,
-        closeButton:true,
-      }).setDOMContent();
+      pe.addEventListener('click',ev=>{
+        setSelectedRide({_id,ride,pickupPoint,dropPoint})
+        // map?.easeTo({
+        //   center:[dropPoint.longitude,dropPoint.latitude]
+        // })
+      })
+      // const puPopUpElement = document.createElement('div');
+      // puPopUpElement.innerHTML = `
+      // <h1> ${_id} </h1>
+      // <button onclick=${()=>console.log("Will Work",dropPoint)}> show drop point </button>
+      // `;
+
+      // let pickPopUp = new tt.Popup({
+      //   className:"card",
+      //   closeOnClick:true,
+      //   closeButton:true,
+      // }).setDOMContent(puPopUpElement);
       let pm = new tt.Marker({element:pe})
         .setLngLat({lat:pickupPoint.latitude!,lng:pickupPoint.longitude!})
-        .addTo(map!);
+        .addTo(map!)
+        // .setPopup(pickPopUp);
+
+
+        // const dpPopUpElement = document.createElement('div');
+        // puPopUpElement.innerHTML = `
+        // <h1> ${_id} </h1>
+        // <button onclick=${()=>console.log("Will Work",dropPoint)}> show drop point </button>
+        // `;
+  
+        // let dropPopUp = new tt.Popup({
+        //   className:"card",
+        //   closeOnClick:true,
+        //   closeButton:true,
+        // }).setDOMContent(dpPopUpElement);
 
       const ee = document.createElement('div');
+     
       ee.id = 'drop-marker';
  let dm = new tt.Marker({element:ee})
         .setLngLat({lat:dropPoint.latitude!,lng:dropPoint.longitude!})
         .addTo(map!)
+        // .setPopup(dropPopUp);
         
     }
   }
@@ -269,7 +306,9 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
    
            </div>
           
-          <div ref={mapElement} className="mapDiv col-span-2"  ></div>
+          <div ref={mapElement} className="mapDiv col-span-2"  >
+        
+          </div>
           
 
         </CardBody>
