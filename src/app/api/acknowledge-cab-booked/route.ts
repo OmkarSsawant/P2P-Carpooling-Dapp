@@ -7,5 +7,6 @@ export async function GET(req:NextRequest){
     const db = (await mongoClientPromise).db('peercab');
     db.collection('rides')
     .updateOne({_id:id},{$inc:{seats:-1}})
+    //TODO: SEND NOTIFICATION FOR DRIVER THAT RIDE BOOKEB BY USER_ID
     return NextResponse.json({"HURRAY":"UNDERSTOOD"})
 }
