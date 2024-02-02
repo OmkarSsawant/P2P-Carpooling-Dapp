@@ -80,7 +80,8 @@ useEffect(() => {
       address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
       functionName:"registerRide",
       args:[
-          (car.data as any).seats,
+          //TODO: (car.data as any).seats,
+          4,
           String(startPlace?.address?.freeformAddress),
           String(endPlace?.address?.freeformAddress),
           BigInt(parseFloat(fee) * 10**18),
@@ -96,10 +97,13 @@ useEffect(() => {
 
     let ride = {
       "name" : (car.data as any).name,
+      //TODO "seats":(car.data as any).seats,
+      "seats":4,
+
       "start" : startPlace,
      "end" : endPlace,
      "driverAddress":account.address,
-      "rideId":lastId,
+      "rideId":parseInt(lastId),
      "fare": Math.round(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
       "reached":0,

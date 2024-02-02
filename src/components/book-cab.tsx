@@ -151,7 +151,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
       const pe = document.createElement('div');
       pe.id = 'pickup-marker';
       pe.addEventListener('click',ev=>{
-        // setSelectedRide({_id,ride,pickupPoint,dropPoint})
+        setSelectedRide({_id,ride,pickupPoint,dropPoint})
           console.log("selected",{_id,ride,pickupPoint,dropPoint});
           
       })
@@ -203,10 +203,10 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     abi,
     functionName:"addUserToRide",
     args:[
-      selectedRide.driverAddress,
-      selectedRide.rideId 
+      selectedRide.ride.driverAddress,
+      selectedRide.ride.rideId 
     ],
-    value:selectedRide.ride.fare
+    value:BigInt(selectedRide.ride.fare)
   })
   await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}`)
   alert(`
