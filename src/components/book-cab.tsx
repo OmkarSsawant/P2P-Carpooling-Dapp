@@ -208,6 +208,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     ],
     value:selectedRide.ride.fare
   })
+  await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}`)
   alert(`
     Successfully Booked Cab ${txn}
   `)
