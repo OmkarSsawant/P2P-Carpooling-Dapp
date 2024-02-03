@@ -10,7 +10,7 @@ import { RideDetails } from "@/components/selected-ride";
 export default function AciveRides(){
   const [activeRide,setActiveRide] = useState(undefined)
   const {address,isConnected} = useAccount()
-  const {writeContractAsync} = useWriteContract()
+  const {writeContractAsync,error} = useWriteContract()
     useEffect(()=>{
       console.log([isConnected,address]);
       if(isConnected)
@@ -32,20 +32,27 @@ export default function AciveRides(){
   }
 
     return (<>
-        <P2PCabNavBar pageIndex={0}/>
+        <P2PCabNavBar pageIndex={4}/>
+        {error && <p className="bg-white text-danger">{error.message}</p>}
         <Spacer className="h-10"/>
-          <Tabs>
-          <Tab key="Active Ride" title="Active Ride">
-              {activeRide ? <RideDetails ride={{
+          <Tabs className="mx-10">
+          <Tab  className="mx-5" key="Active Ride" title="Active Ride">
+              {activeRide ? <center><div className="w-1/2">
+                <RideDetails
+              
+              ride={{
                 startAddress:activeRide.ride.start.address.freeformAddress,
                 endAddress:activeRide.ride.end.address.freeformAddress,
                 dist:activeRide.ride.dist,
                 fare:activeRide.ride.fare
               }} footer={
-                <Button onClick={(ev)=>{ev.preventDefault();startRide(activeRide);}}> Start Ride</Button>
-              }/> : <center><h1>No Active Ride</h1></center>}
+                <Button color="warning" onClick={(ev)=>{ev.preventDefault();startRide(activeRide);}}> Start Ride</Button>
+              }/>
+
+              </div> 
+              </center>: <center><h1>No Active Ride</h1></center>}
           </Tab>
-          <Tab key="History" title="History">
+          <Tab className="mx-5" key="History" title="History">
             <center>
               <h1>All Previous Transactions from Blockchain</h1>
             </center>

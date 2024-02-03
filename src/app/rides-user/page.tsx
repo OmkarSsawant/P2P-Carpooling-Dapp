@@ -41,20 +41,20 @@ if(droppedAllUsers){
   }
 
     return (<>
-        <P2PCabNavBar pageIndex={0}/>
+        <P2PCabNavBar pageIndex={5}/>
         <Spacer className="h-10"/>
-          <Tabs>
-          <Tab key="Active Ride" title="Active Ride">
+          <Tabs className="mx-10">
+          <Tab className="mx-5" key="Active Ride" title="Active Ride">
               {activeRide ? <RideDetails ride={{
                 startAddress:activeRide.ride.start.address.freeformAddress,
                 endAddress:activeRide.ride.end.address.freeformAddress,
                 dist:activeRide.ride.dist,
                 fare:activeRide.ride.fare
               }} footer={
-                <Button onClick={(ev)=>{ev.preventDefault();endRide(activeRide);}}> Start Ride</Button>
+                <Button color="danger" onClick={(ev)=>{ev.preventDefault();endRide(activeRide);}}> End Ride</Button>
               }/> : <center><h1>No Active Ride</h1></center>}
           </Tab>
-          <Tab key="History" title="History">
+          <Tab className="mx-5" key="History" title="History">
             <center>
               <h1>All Previous Transactions from Blockchain</h1>
             </center>

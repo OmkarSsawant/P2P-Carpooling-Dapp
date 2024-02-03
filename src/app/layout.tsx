@@ -17,7 +17,7 @@ export default function RootLayout(props: { children: ReactNode }) {
       <body >
       <Providers>
         
-        <main className='dark text-foreground bg-gradient-to-tr from-violet-900 from-20% via-black via-100% to-purple-500 to-50%' style={{
+        <main className='dark text-foreground bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-slate-900' style={{
           height:"100vh"
         }}>
           

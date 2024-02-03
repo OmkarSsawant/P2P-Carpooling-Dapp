@@ -336,7 +336,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
               endAddress:selectedRide.ride.end.address.freeformAddress,
               fare:selectedRide.ride.fare,
               dist:dist
-            }} footer={<Button onClick={bookRide} color="success"> Book </Button>}>
+            }} footer={<Button onClick={bookRide} color="success"> Join Ride </Button>}>
               <Button   onClick={()=>{
             if(selectedRide)
             map?.easeTo({
