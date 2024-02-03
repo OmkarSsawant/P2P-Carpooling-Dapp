@@ -25,6 +25,8 @@ export default function RideCreator(){
     const [searchResults,setSearchResults] = useState([]);
     const [searchResults2,setSearchResults2] = useState([]);
     const [fee,setFee] = useState("");
+    const [seats,setSeats] = useState("1");
+
 
     const [startPlace,setStartPlace] = useState<any|undefined>()
     const [endPlace,setEndPlace] = useState<any|undefined>()
@@ -82,7 +84,7 @@ useEffect(() => {
       functionName:"registerRide",
       args:[
           //TODO: (car.data as any).seats,
-          4,
+          BigInt(seats),
           String(startPlace?.address?.freeformAddress),
           String(endPlace?.address?.freeformAddress),
           BigInt(parseFloat(fee) * 10**18),
@@ -98,9 +100,7 @@ useEffect(() => {
 
     let ride = {
       "name" : (car.data as any).name,
-      //TODO "seats":(car.data as any).seats,
-      "seats":4,
-
+      "seats":parseInt(seats),
       "start" : startPlace,
      "end" : endPlace,
      "driverAddress":account.address,
@@ -284,7 +284,11 @@ for(const wp of waypoints){
         {item.poi.name}</AutocompleteItem>}
     </Autocomplete>
     <Spacer className="h-10"/>
-    <Input className="w-4/5" type="text" label="Charge Per KM" value={fee}   onChange={(t)=>{
+    <Input className="w-4/5" type="number" label="Avaiable Seats" value={seats}   onChange={(t)=>{
+              setSeats(t.currentTarget.value)
+          }}/>
+    <Spacer className="h-5"/>
+    <Input className="w-4/5" type="number" label="Charge Per KM" value={fee}   onChange={(t)=>{
               setFee(t.currentTarget.value)
           }}/>
            </div>
