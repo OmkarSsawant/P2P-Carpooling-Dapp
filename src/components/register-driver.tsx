@@ -2,11 +2,11 @@ import { usePrepareTransactionRequest, useReadContract, useWriteContract } from 
 import {abi} from '@/abi/Carpooling.json';
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, CardBody, Divider, Input, Spacer, Tab, Tabs, Textarea } from "@nextui-org/react";
-
-
+import { create, urlSource } from 'ipfs-http-client'
+const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' })
 export default function DriverRegisterer(){
     const [selected, setSelected] = useState("driver");
-    const {data:hash,writeContract,error,writeContractAsync} = useWriteContract()
+    const {data:hash,error,writeContractAsync} = useWriteContract()
     const result = useReadContract({
         address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
         abi,
@@ -22,8 +22,11 @@ export default function DriverRegisterer(){
     const [NoPlate,setNoPlate] = useState("")
     const [color,setcolor] = useState("")
     const [amount,setamount] = useState("")
+    const [licenceIPFS,setLicenseIPFS] = useState('')
+    const [licenseFile,setLicenseFile] = useState<File|undefined>(undefined)
+
     
-    return(<>
+return(<>
    
     { error && (<><h1 color="danger"> Error {error?.message}</h1><br/>,</>)}
     <center>
@@ -90,10 +93,14 @@ export default function DriverRegisterer(){
               />
     <Spacer/>
     <Spacer/>
-
-    <Button color="secondary">
-        upload License
-    </Button>
+          
+    <input className="mx-5" type="file" onChange={async fe=>
+        {  
+            //  console.log(fe.target.files);
+        
+            setLicenseFile(fe.target.files[0])
+        
+}} color="secondary"/>
     <Spacer/>
        
     <Input
@@ -216,34 +223,47 @@ type="number"
         color:"white"
     }} onClick={async (ev)=>{
         console.log(name);
-      let txn = await   writeContractAsync({
-            address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
-            abi,
-            functionName:"registerDriver",
-            args:[
-                  "name",
-                  BigInt("767868908"),
-                  "email",
-                  "ipfs://todo",
-                  "address",
-                  BigInt("788787")  
-            ]
-        })
+   
+        const abuf = await licenseFile!.arrayBuffer()
+        console.log(abuf);
+        
+            const {path,cid} = await ipfs.add(abuf)
+            console.log(path,cid)
         
 
-      let txn2 =  await  writeContractAsync({
-            address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
-            abi,
-            functionName:"registerCar",
+          let txn = await   writeContractAsync({
+                address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+                abi,
+                functionName:"registerDriver",
+                args:[
+                      name,
+                      BigInt(phone),
+                      email,
+                      path,
+                      address,
+                      BigInt(pincode)  
+                ]
+            })
             
-            args:[
-                "carName",
-                "NoPlate",
-                "color",
-                BigInt(parseFloat("0.4") * 10**18)
-            ],
-        })
-        alert(`Success : Registered You as Driver \n[${txn},${txn2}]`)
+    
+          let txn2 =  await  writeContractAsync({
+                address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+                abi,
+                functionName:"registerCar",
+                
+                args:[
+                    "carName",
+                    "NoPlate",
+                    "color",
+                    BigInt(parseFloat("0.4") * 10**18)
+                ],
+            })
+            alert(`Success : Registered You as Driver \n[${txn},${txn2}]`)
+            
+
+
+        
+      
         
     }}> Register As Driver </Button>
     </center>
