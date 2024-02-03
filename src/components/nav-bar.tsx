@@ -42,6 +42,17 @@ export const P2PCabNavBar : FunctionComponent<PageInfo> = ({pageIndex})=>{
             Book A Cab
           </Link>
         </NavbarItem>
+        <NavbarItem>
+          <Link color={pageIndex==3?undefined:"foreground"}  href="/rides-driver">
+            Driver Rides
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color={pageIndex==3?undefined:"foreground"}  href="/rides-user">
+            User Rides
+          </Link>
+        </NavbarItem>
+
         </NavbarContent>
     <NavbarContent justify='end'>
 

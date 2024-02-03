@@ -3,7 +3,7 @@ import mongoClientPromise from '@/lib/mongo'
 import { ObjectId } from "mongodb";
 //ua is must
 
-export async function GET(req:NextRequest){
+export async function PATCH(req:NextRequest){
     const activeRideId = req.nextUrl.searchParams.get("ride-id")!;
     const db = (await mongoClientPromise).db("peercab");
     
