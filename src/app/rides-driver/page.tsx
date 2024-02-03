@@ -1,6 +1,7 @@
 import { useReadContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Listbox, ListboxItem } from "@nextui-org/react";
+import mongoClientPromise from '@/lib/mongo';
 
 export default function AciveRides(){
     
