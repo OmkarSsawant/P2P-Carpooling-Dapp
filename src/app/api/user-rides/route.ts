@@ -7,32 +7,38 @@ export async function GET(req:NextRequest){
     const active = req.nextUrl.searchParams.get("active");
 
     const db = (await mongoClientPromise).db("peercab");
-
+    const filter = {
+        'ride.users' : {$elemMatch : {$eq:userAddress}}       
+     }
     var res =  db.collection("rides")
-    .find({          
-        $where() {
-            if(active){
-                return (userAddress in this.ride.users) && this.ride.status=="ongoing";
-            }
-           return (userAddress in this.ride.users)
-        },
-    })
+    .find(active ? {
+        ...filter,
+        "status":"ongoing"
+    }:filter)
 
 
    return NextResponse.json(await res.toArray())
 }
 
+
 export async function PATCH(req:NextRequest){
  
-    const db = (await mongoClientPromise).db("peercab");
-    const compltedRideId = req.nextUrl.searchParams.get("mark-completed")!;
+        const activeRideId = req.nextUrl.searchParams.get("dropped-ride-id")!;
+        const db = (await mongoClientPromise).db("peercab");
+        
+         await db.collection("rides")
+        .updateOne({          
+            _id:new ObjectId(activeRideId)
+        },{
+                $inc:{'ride.seats':-1}
+        })
+        let seats =(await db.collection("rides")
+        .find({          
+            _id:new ObjectId(activeRideId)
+        }).toArray())[0].ride.seats;
+      
+        return NextResponse.json({"droppedAllUsers":seats==0});
     
-        let res = await db.collection("rides")
-    .updateOne({          
-        _id:new ObjectId(compltedRideId)
-    },{
-            $set:{"ride.status":"completed"}
-    })
-    return NextResponse.json(res);
+    
 }
 

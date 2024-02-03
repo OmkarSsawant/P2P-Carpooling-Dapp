@@ -1,4 +1,4 @@
-import { usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
+import { useAccount, usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Key, MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Autocomplete, AutocompleteItem, AutocompleteSection, Avatar, Button, Card, CardBody, CardFooter, Chip, Divider, Input, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
@@ -9,6 +9,7 @@ import { PlaceFinder } from "@/tom-tom/place-finder";
 import { compressRoute, splitLine } from "@/lib/map-utils";
 
 import Image from "next/image";
+import { RideDetails } from "./selected-ride";
 
 export  function CabBooker(){
     const {data:hash,error,writeContractAsync} = useWriteContract()
@@ -26,6 +27,7 @@ export  function CabBooker(){
     const [geojson,setGeoJson] = useState("")
     const [selectedRide,setSelectedRide]  = useState<any|undefined>()
     const [dist,setDist] = useState(0)
+    const account = useAccount()
 const mapElement = useRef();
 const dateTimeInput = useRef();
 const edateTimeInput = useRef();
@@ -209,7 +211,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     ],
     value:BigInt(selectedRide.ride.fare * dist) 
   })
-  await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}`)
+  await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}&user-id=${account.address}`)
   alert(`
     Successfully Booked Cab ${txn}
   `)
@@ -329,77 +331,34 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
 
            {selectedRide && 
            <div className="col-span-2 mr-10">
-            <center>
-              <Card isBlurred >
-                <CardBody>
-           
-
-
-    <Spacer className="h-2"/>
-
-<Textarea
-            isReadOnly
-            label="Starts From"
-            value={selectedRide?.ride?.start?.address?.freeformAddress}
-            />
-      <Spacer/><Spacer/>
-      <Textarea
-            isReadOnly
-            label="Ends At"
-            value={selectedRide?.ride?.end?.address?.freeformAddress}
-            />
-      <Spacer/><Spacer/>
-      <Divider/>
-      <Button   onClick={()=>{
-                    if(selectedRide)
-                    map?.easeTo({
-                      center:[selectedRide?.pickupPoint.longitude,selectedRide?.pickupPoint.latitude]
-                    })
-                  }
-                  } color="success" startContent={<Image alt="pi" width={30} height={30} src="/assets/pickup.svg"/>}>
-        Show Pickup Point
-      </Button>  
-            <Spacer/><Spacer/>
-            <Button   onClick={()=>{
-                    if(selectedRide)
-                    map?.easeTo({
-                      center:[selectedRide?.dropPoint.longitude,selectedRide?.dropPoint.latitude]
-                    })
-                  }
-                  } color="success" startContent={<Image alt="ei" width={30} height={30} src="/assets/taxi-stop.png"/>}>
-        Show Drop Stop
-      </Button>   
-           
-            <Spacer/><Spacer/>
-      <div className="flex">
-
-            <h1>Fare : </h1>
-            <Chip
-        variant="flat"
-        avatar={
-          <Avatar
-            name="JW"
-            src="https://i.pravatar.cc/300?u=a042581f4e29026709d"
-          />
-        }
-      >
-      {(selectedRide?.ride?.fare/10**18) * dist}  Eth 
-      </Chip>
-           
-      </div>
-    <Spacer className="h-2"/>
-
-                </CardBody>
-             <CardFooter>
-              <center>
-              <Button onClick={bookRide} color="success"> Book </Button>
-              </center>
-             </CardFooter>
-              </Card>
-            </center>
-          
-           </div>
-           }
+            <RideDetails ride={{
+              startAddress:selectedRide.ride.start.address.freeformAddress,
+              endAddress:selectedRide.ride.end.address.freeformAddress,
+              fare:selectedRide.ride.fare,
+              dist:dist
+            }} footer={<Button onClick={bookRide} color="success"> Book </Button>}>
+              <Button   onClick={()=>{
+            if(selectedRide)
+            map?.easeTo({
+              center:[selectedRide?.pickupPoint.longitude,selectedRide?.pickupPoint.latitude]
+            })
+          }
+          } color="success" startContent={<Image alt="pi" width={30} height={30} src="/assets/pickup.svg"/>}>
+Show Pickup Point
+</Button>  
+    <Spacer/><Spacer/>
+    <Button   onClick={()=>{
+            if(selectedRide)
+            map?.easeTo({
+              center:[selectedRide?.dropPoint.longitude,selectedRide?.dropPoint.latitude]
+            })
+          }
+          } color="success" startContent={<Image alt="ei" width={30} height={30} src="/assets/taxi-stop.png"/>}>
+Show Drop Stop
+</Button>   
+   
+              </RideDetails>
+              </div> }
          
           <div ref={mapElement} className={`mapDiv col-span-3`}>
         

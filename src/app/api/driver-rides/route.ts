@@ -34,3 +34,14 @@ export async function PATCH(req:NextRequest){
     })
     return NextResponse.json(res);
 }
+
+export async function DELETE(req:NextRequest) {
+      const rideId = req.nextUrl.searchParams.get('ride-id')!;
+      const db = (await mongoClientPromise).db("peercab");
+    
+      let res = await db.collection("rides")
+      .deleteOne({          
+          _id:new ObjectId(rideId)
+      })
+      return NextResponse.json(res);       
+}

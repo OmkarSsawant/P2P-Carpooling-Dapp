@@ -19,6 +19,7 @@ export default function RideCreator(){
       functionName:"getCarDetails",  
     })
     const account = useAccount()
+    const [dist,setDist] = useState(0)
     
     const [loc,setLoc] = useState({"latitude":0,"longitude":0})
     const [searchResults,setSearchResults] = useState([]);
@@ -134,6 +135,7 @@ console.log("Route Calculating ...");
        traffic:false,
        key:"zDdTIbXIoZa6sN1Gqs2WJysenDpQ9Ild"
      })
+    setDist(res.routes[0].summary.lengthInMeters/1000)
      
     let  gj = res!.toGeoJson() 
 console.log("Route Calculated");
