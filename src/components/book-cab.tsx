@@ -1,7 +1,7 @@
 import { useAccount, usePrepareTransactionRequest, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
 import { Key, MouseEventHandler, useEffect, useRef, useState } from "react";
-import { Autocomplete, AutocompleteItem, AutocompleteSection, Avatar, Button, Card, CardBody, CardFooter, Chip, Divider, Input, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea } from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem, AutocompleteSection, Avatar, Button, Card, CardBody, CardFooter, Chip, Divider, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Popover, PopoverContent, PopoverTrigger, Slider, Spacer, Switch, Tab, Tabs, Textarea, useDisclosure } from "@nextui-org/react";
 import '@tomtom-international/web-sdk-maps/dist/maps.css'
 import tt, { LngLat, Point } from '@tomtom-international/web-sdk-maps';
 import tts from '@tomtom-international/web-sdk-services'
@@ -10,6 +10,8 @@ import { compressRoute, splitLine } from "@/lib/map-utils";
 
 import Image from "next/image";
 import { RideDetails } from "./selected-ride";
+import { readContract } from "wagmi/actions";
+import { config } from "@/wagmi";
 
 export  function CabBooker(){
     const {data:hash,error,writeContractAsync} = useWriteContract()
@@ -222,6 +224,24 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     Successfully Booked Cab ${txn}
   `)
   }
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  
+  const [reviews,setReviews] = useState([])
+
+
+ async function loadDriverReviews(){
+    if(!selectedRide) return;
+    const rvs = await readContract(config,{
+      abi,
+      address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      functionName:"getReviewsOfDriver", 
+      args:[
+        selectedRide.ride.driverAddress
+      ]
+    })
+    setReviews(rvs);
+  }
+
 
     return(<>
     
@@ -364,8 +384,8 @@ Show Drop Stop
 </Button>   
 <Divider/>
 <Spacer/><Spacer/>
-<h1>Driver: {} </h1>
-{/* TODO: <Button onClick={openDriverReviewsModal} color="warning"> Show Driver Reviews </Button> */}
+<h1>Driver: {selectedRide.ride.driverAddress} </h1>
+ <Button onPress={loadDriverReviews} color="warning"> Show Driver Reviews </Button>
 <Spacer/><Spacer/>
               </RideDetails>
               </div> }
@@ -378,7 +398,28 @@ Show Drop Stop
         </CardBody>
     </Card>
         </center>      
-       
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent >
+          {(onClose) => (<>
+            <ModalHeader className="flex flex-col gap-1">Driver Reviews</ModalHeader>
+            <ModalBody >
+              {
+                  reviews.map(r => <Card>
+                    <CardBody>
+                      <h1>{r.PID}</h1>
+                      <p>{r.review}</p>
+                    </CardBody>
+                  </Card>)
+              }
+            </ModalBody>
+            <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                </ModalFooter>
+          </>)}
+          </ModalContent>
+          </Modal>
     </>
     
     );
