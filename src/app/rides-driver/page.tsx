@@ -2,19 +2,28 @@
 
 import { useAccount, useReadContract, useWriteContract } from "wagmi"
 import {abi} from '@/abi/Carpooling.json';
-import { Button, Spacer, Tab, Tabs } from "@nextui-org/react";
+import { Button, Card, CardHeader, Listbox, ListboxItem, Spacer, Tab, Tabs ,Image, Divider, CardBody, CardFooter, Link, Chip} from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { P2PCabNavBar } from "@/components/nav-bar";
 import { RideDetails } from "@/components/selected-ride";
+import { useRouter } from "next/router";
 
 export default function AciveRides(){
   const [activeRide,setActiveRide] = useState(undefined)
+  const [rides,setRides] = useState([])
+
   const {address,isConnected} = useAccount()
   const {writeContractAsync,error} = useWriteContract()
+  const ridesHistory = useReadContract({
+    abi,
+    address:"0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    functionName:"getRidesOfDriver", 
+  })
+
     useEffect(()=>{
       console.log([isConnected,address]);
       if(isConnected)
-      loadActiveRidesOfDriver()
+      loadRidesOfDriver()
     },[isConnected,address])
   async function startRide({_id,ride}:{_id:string;ride:any}): Promise<void> {
      await writeContractAsync({
@@ -29,6 +38,11 @@ export default function AciveRides(){
         method:'PATCH'
       })
       alert("Ride Started!")
+  }
+  const router = useRouter()
+
+  function showRide(_id: any) {
+    router.push(`/cab-nav/${_id}`)
   }
 
     return (<>
@@ -46,29 +60,65 @@ export default function AciveRides(){
                 dist:activeRide.ride.dist,
                 fare:activeRide.ride.fare
               }} footer={
-                <Button color="warning" onClick={(ev)=>{ev.preventDefault();startRide(activeRide);}}> Start Ride</Button>
-              }/>
+                <>
+                <Spacer/>
+                <Button color="primary" onClick={(ev)=>{ev.preventDefault();showRide(activeRide._id);}}> Show Ride</Button>
+
+                </>
+   
+   }/>
 
               </div> 
               </center>: <center><h1>No Active Ride</h1></center>}
           </Tab>
-          <Tab className="mx-5" key="History" title="History">
+          <Tab className="mx-5" key="Pending" title="Pending">
             <center>
-              <h1>All Previous Transactions from Blockchain</h1>
-            </center>
+              
+          {rides.map(({_id,ride})=>      {
+            return (<RideDetails ride={{
+                  dist:ride.dist,
+                  startAddress:ride.start.address.freeformAddress,
+                  endAddress:ride.end.address.freeformAddress,
+                  fare:ride.fare
+            }} footer={<Button onClick={ev=>startRide({_id,ride})}>Start Ride</Button>}/>);
+          })}
+              
+   
+                        </center>
+        </Tab>
+        <Tab key={"history"}  title="History">
+             {ridesHistory.data ? Array.from(ridesHistory.data!).map((ride:any)=>      {
+            
+            if(!ride.active){
+              return (<RideDetails ride={{
+                    dist:ride.dist,
+                    startAddress:ride.start.address.freeformAddress,
+                    endAddress:ride.end.address.freeformAddress,
+                    fare:ride.fare
+              }} footer={<center><Chip>{ride.paid ? "Completed" : "Pending"}</Chip></center>}/>);
+            }
+            else return (<></>)
+          }) : <><center>No History Found</center></>}
         </Tab>
         </Tabs>
        
        
     </>)
 
-async function loadActiveRidesOfDriver() {
-  let res = await fetch(`/api/driver-rides?da=${address}`)
+async function loadRidesOfDriver() {
+  // all rides
+  let res = await fetch(`/api/driver-rides?da=${address}&status=pending`)
   let results = await res.json()
   console.log(address,results);
-  
-  setActiveRide(results[0])
+  setRides(results)
+
+  // active ride
+  let ares = await fetch(`/api/driver-rides?da=${address}&status=ongoing`)
+  let aresults = await ares.json()
+  console.log(address,aresults[0]);
+  setActiveRide(aresults[0])
 }
+
 }
 
 

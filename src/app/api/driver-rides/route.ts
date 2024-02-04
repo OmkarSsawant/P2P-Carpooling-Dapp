@@ -5,15 +5,12 @@ import { ObjectId } from "mongodb";
 //Reads the active rides of driver
 export async function GET(req:NextRequest){
     const driverAddress = req.nextUrl.searchParams.get("da")!;
-    const active = req.nextUrl.searchParams.get("active");
+    const status = req.nextUrl.searchParams.get("status");
     const db = (await mongoClientPromise).db("peercab");
-    console.log(active);
     var res =  db.collection("rides")
-    .find(active ? {  
+    .find({  
         'ride.driverAddress': driverAddress,
-        'ride.status':'ongoing'
-    } : {
-        'ride.driverAddress': driverAddress,
+        'ride.status':status
     })
 
 

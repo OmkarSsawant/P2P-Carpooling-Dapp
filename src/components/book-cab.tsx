@@ -211,7 +211,13 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     ],
     value:BigInt(selectedRide.ride.fare * dist) 
   })
-  await fetch(`api/acknowledge-cab-booked?id=${selectedRide._id}&user-id=${account.address}`)
+  await fetch(`api/join-ride?id=${selectedRide._id}&user-id=${account.address}`,{
+    method:"PATCH",
+    body:JSON.stringify({
+      "pickupPoint":selectedRide.pickupPoint,
+      "dropPoint":selectedRide.dropPoint
+    })
+  })
   alert(`
     Successfully Booked Cab ${txn}
   `)
@@ -356,7 +362,11 @@ Show Pickup Point
           } color="success" startContent={<Image alt="ei" width={30} height={30} src="/assets/taxi-stop.png"/>}>
 Show Drop Stop
 </Button>   
-   
+<Divider/>
+<Spacer/><Spacer/>
+<h1>Driver: {} </h1>
+{/* TODO: <Button onClick={openDriverReviewsModal} color="warning"> Show Driver Reviews </Button> */}
+<Spacer/><Spacer/>
               </RideDetails>
               </div> }
          

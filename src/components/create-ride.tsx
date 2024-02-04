@@ -108,6 +108,7 @@ useEffect(() => {
      "fare": Math.round(parseFloat(fee) * 10**18),
       "depart" : Date.parse((dateTimeInput!.current! as any).value),
       "reached":0,
+      "status":"pending"
     }
 
     console.log("geojson",geojson);

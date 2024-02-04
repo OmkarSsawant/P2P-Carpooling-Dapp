@@ -8,7 +8,7 @@ export async function GET(req:NextRequest){
 
     const db = (await mongoClientPromise).db("peercab");
     const filter = {
-        'ride.users' : {$elemMatch : {$eq:userAddress}}       
+        'ride.users' : {$elemMatch : {'userId':{$eq:userAddress}}}       
      }
     var res =  db.collection("rides")
     .find(active ? {

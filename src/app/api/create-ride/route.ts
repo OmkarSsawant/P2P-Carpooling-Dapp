@@ -34,7 +34,3 @@ console.log("check",`routes:${res.insertedId}`);
 
     return NextResponse.json({"HURRAY":"UNDERSTOOD ",res})
 }
-
-export  function GET(req:NextRequest){
-    return NextResponse.json({"HURRAY":"UNDERSTOOD"})
-}

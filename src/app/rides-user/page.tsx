@@ -35,7 +35,7 @@ if(droppedAllUsers){
   await fetch(`/api/driver-rides?ride-id=${_id}`,{
     method:'DELETE'
   })
-  alert("Ride Ended!")
+  alert("Ride Ended!")//TODO: Modal to ask Review
 
 }
   }
@@ -43,8 +43,6 @@ if(droppedAllUsers){
     return (<>
         <P2PCabNavBar pageIndex={5}/>
         <Spacer className="h-10"/>
-          <Tabs className="mx-10">
-          <Tab className="mx-5" key="Active Ride" title="Active Ride">
               {activeRide ? <RideDetails ride={{
                 startAddress:activeRide.ride.start.address.freeformAddress,
                 endAddress:activeRide.ride.end.address.freeformAddress,
@@ -52,16 +50,7 @@ if(droppedAllUsers){
                 fare:activeRide.ride.fare
               }} footer={
                 <Button color="danger" onClick={(ev)=>{ev.preventDefault();endRide(activeRide);}}> End Ride</Button>
-              }/> : <center><h1>No Active Ride</h1></center>}
-          </Tab>
-          <Tab className="mx-5" key="History" title="History">
-            <center>
-              <h1>All Previous Transactions from Blockchain</h1>
-            </center>
-        </Tab>
-        </Tabs>
-       
-       
+              }/> : <center><h1>No Active Ride</h1></center>}       
     </>)
 
 async function loadActiveRidesOfUser() {
