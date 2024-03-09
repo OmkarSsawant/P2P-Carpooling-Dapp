@@ -19,12 +19,12 @@ export const P2PCabNavBar : FunctionComponent<PageInfo> = ({pageIndex})=>{
       return metamask
     }
     return (  <Navbar
-        title='Peer2Peer Carpooling'
+        title='Peer Cab'
         
         >
           <NavbarBrand >
         
-        <p className="font-bold text-inherit">Peer2Peer Carpooling</p>
+        <p className="font-bold text-inherit">Peer Cab</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
