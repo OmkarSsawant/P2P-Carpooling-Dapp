@@ -36,16 +36,16 @@ function App() {
         <Spacer y={2} />
         </div>
     <div className="s2">
-      <Image src='assets/p2pcp.png' alt='ride share image'/>
+      {/* <Image src='assets/p2pcp.png' alt='ride share image'/> */}
     </div>
         </div>
         
-        <Spacer y={4} />
+        <Spacer y={'50vh'} />
         <div className="m-16 ">
         <h2 className='text-6xl font-black text-gray-900 dark:text-white'>Why Choose Us?</h2>
         <Spacer y={2} />
         <div className="grid grid-cols-3 gap-16">
-        <Card>
+        <Card isBlurred className='bg-background/60 dark:bg-default-100/50'>
           <Image
           className='m-8'
 
@@ -60,7 +60,7 @@ function App() {
           </CardBody>
         </Card>
         <Spacer y={2} />
-        <Card>
+        <Card isBlurred className='bg-background/60 dark:bg-default-100/50'>
           <Image
           className='m-8'
             src="/assets/cab_search.jpg" // Prompt: "convenient carpooling"
@@ -74,7 +74,7 @@ function App() {
           </CardBody>
         </Card>
         <Spacer y={2} />
-        <Card>
+        <Card isBlurred className='bg-background/60 dark:bg-default-100/50'>
           <Image
           className='m-2'
 

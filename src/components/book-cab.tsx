@@ -246,7 +246,7 @@ const findRides:MouseEventHandler<HTMLButtonElement> = async ev => {
     return(<>
     
     { error && (<><h1 color="danger"> Error {error?.message}</h1><br/>,</>)}
-     <h1 className="text-5xl mx-8 font-mono"> Find Peer Cab </h1> 
+     <h1 className="text-6xl font-black text-gray-900 dark:text-white"> Find Peer Cab </h1> 
      <Spacer className="h-4"/>
      <center>
      <Card className="w-11/12 h-11/12">

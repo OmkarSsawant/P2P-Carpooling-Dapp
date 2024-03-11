@@ -186,7 +186,7 @@ for(const wp of waypoints){
     return(<>
     
     { error && (<><h1 color="danger"> Error {error?.message}</h1><br/>,</>)}
-     <h1 className="text-5xl mx-8 font-mono"> Create Ride </h1> 
+     <h1 className="text-6xl font-black text-gray-900 dark:text-white"> Create Ride </h1> 
      <Spacer className="h-4"/>
      <center>
      <Card className="w-11/12 h-11/12">
