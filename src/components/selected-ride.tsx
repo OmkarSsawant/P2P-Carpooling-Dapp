@@ -5,7 +5,7 @@ export interface Ride{
     startAddress:string;
     endAddress:string;
     fare:string,
-    dist:string
+    dist:string|undefined
 }
 
 export function RideDetails(props:{ride:Ride,footer?:ReactNode,children?:ReactNode}){
@@ -45,7 +45,7 @@ avatar={
   />
 }
 >
-{(parseInt(props.ride.fare)/10**18) * parseFloat(props.ride.dist)}  Eth 
+{props.ride.dist ? ((parseInt(props.ride.fare)/10**18) * parseFloat(props.ride.dist)) : (parseInt(props.ride.fare)/10**18)}  Eth 
 </Chip>
    
 </div>

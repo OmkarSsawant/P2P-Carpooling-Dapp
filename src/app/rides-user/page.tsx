@@ -85,7 +85,7 @@ value={review}
                       review  
                     ]
                   })
-                  
+                  setActiveRide(undefined)
                   onClose()
                 }}>
                   Submit

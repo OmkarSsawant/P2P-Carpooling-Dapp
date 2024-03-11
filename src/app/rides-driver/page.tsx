@@ -39,9 +39,9 @@ export default function AciveRides(){
       })
       alert("Ride Started!")
   }
-  const router = useRouter()
 
   function showRide(_id: any) {
+    const router = useRouter()
     router.push(`/cab-nav/${_id}`)
   }
 
@@ -51,7 +51,7 @@ export default function AciveRides(){
         <Spacer className="h-10"/>
           <Tabs className="mx-10">
           <Tab  className="mx-5" key="Active Ride" title="Active Ride">
-              {activeRide ? <center><div className="w-1/2">
+              {activeRide!=undefined ? <center><div className="w-1/2">
                 <RideDetails
               
               ride={{
@@ -91,10 +91,10 @@ export default function AciveRides(){
             
             if(!ride.active){
               return (<RideDetails ride={{
-                    dist:ride.dist,
-                    startAddress:ride.start.address.freeformAddress,
-                    endAddress:ride.end.address.freeformAddress,
-                    fare:ride.fare
+                    dist:undefined,
+                    startAddress:ride.from,
+                    endAddress:ride.to,
+                    fare:ride.totalCharge.toString()
               }} footer={<center><Chip>{ride.paid ? "Completed" : "Pending"}</Chip></center>}/>);
             }
             else return (<></>)
@@ -115,8 +115,10 @@ async function loadRidesOfDriver() {
   // active ride
   let ares = await fetch(`/api/driver-rides?da=${address}&status=ongoing`)
   let aresults = await ares.json()
-  console.log(address,aresults[0]);
-  setActiveRide(aresults[0])
+  console.log(address,aresults);
+  if(aresults.length > 0){
+    setActiveRide(aresults[0])
+  } 
 }
 
 }
